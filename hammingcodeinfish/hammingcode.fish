@@ -34,15 +34,30 @@ set array
 for i in (seq 1 16)
     if test $bits[$i] -eq 1;set -a array (math $i-1);end
 end
-
+echo $array
 # get indices in binary 
 set binarray
 for i in $array;set -a binarray (dec2bin_hax $i);end
 
+# echo $binarray
 scuffed_xor $binarray
-set sig_bit (string join "" $sig_bit)
+# echo $sig_bit
 
+set sig_bit (string join "" $sig_bit)
+echo $sig_bit
 set dec (bin2dec_hax $sig_bit)
-set dec (math $dec-1)
-echo $dec
+set dec (math $dec) #indices are fucked, starts from 1
+
+set bits[$dec] (math "abs($bits[$dec]-1)")
+echo $bits
+
+set array
+for i in (seq 1 16)
+    if test $bits[$i] -eq 1;set -a array (math $i-1);end
+end
+set binarray
+for i in $array;set -a binarray (dec2bin_hax $i);end
+
+scuffed_xor $binarray
+echo "Testing ==> $sig_bit"
 
