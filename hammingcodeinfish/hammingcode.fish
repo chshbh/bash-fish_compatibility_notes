@@ -26,38 +26,32 @@ function scuffed_xor -d "xor hax. how? take all the bits at significant position
     set sig_bit[4] (math "$sig_bit[4]%2")
 end
 
+
 # two ways to generate random string of {0,1} simulating bit string of 16bits.
 # set bits (shuf --input-range=0-1 --repeat --head-count=16)
-set -q bits;for i in (seq 16);set -a bits (random 0 1);end 
-echo $bits
+set -q bits;for i in (seq 16);set -a bits (random 0 1);end
+# set bits 0 1 1 1 0 1 1 1 1 0 0 0 1 0 0 0 # testcase
+echo "Random 16 bit string : $bits"
+
 set array
 for i in (seq 1 16)
     if test $bits[$i] -eq 1;set -a array (math $i-1);end
 end
-echo $array
+echo "Parity(+1) indices at : $array"
 # get indices in binary 
 set binarray
 for i in $array;set -a binarray (dec2bin_hax $i);end
+echo "Parity(+1) indices in binary : $binarray"
 
-# echo $binarray
 scuffed_xor $binarray
-# echo $sig_bit
+echo "Position of error bit after xor'ing : $sig_bit"
 
 set sig_bit (string join "" $sig_bit)
-echo $sig_bit
+echo "Significant error bit in binary : $sig_bit"
+
 set dec (bin2dec_hax $sig_bit)
-set dec (math $dec) #indices are fucked, starts from 1
-
+# set dec (math $dec-1) #indices are fucked, starts from 1
+echo "Significant error bit in decimal : "(math $dec-1)
+    
 set bits[$dec] (math "abs($bits[$dec]-1)")
-echo $bits
-
-set array
-for i in (seq 1 16)
-    if test $bits[$i] -eq 1;set -a array (math $i-1);end
-end
-set binarray
-for i in $array;set -a binarray (dec2bin_hax $i);end
-
-scuffed_xor $binarray
-echo "Testing ==> $sig_bit"
-
+echo "Correcting the error bit by flipping the flag : $bits"
